@@ -1,5 +1,5 @@
 CREATE TABLE country (
-    code CHAR(3) PRIMARY KEY,
+    code VARCHAR(3) PRIMARY KEY,
     name VARCHAR(100)
 );
 
@@ -13,7 +13,7 @@ CREATE TABLE venue (
     name          VARCHAR(255) NOT NULL,
     city          VARCHAR(100),
     capacity      INT,
-    _country_code CHAR(3) REFERENCES country(code)
+    _country_code VARCHAR(3) REFERENCES country(code)
 );
 
 CREATE TABLE team (
@@ -21,9 +21,9 @@ CREATE TABLE team (
     slug          VARCHAR(255) NOT NULL UNIQUE,
     name          VARCHAR(255) NOT NULL,
     official_name VARCHAR(255) NOT NULL,
-    abbreviation  CHAR(3)      NOT NULL,
+    abbreviation  VARCHAR(3)      NOT NULL,
     founded_year  INT,
-    _country_code CHAR(3) NOT NULL REFERENCES country(code)
+    _country_code VARCHAR(3) NOT NULL REFERENCES country(code)
 );
 
 CREATE TABLE stage (

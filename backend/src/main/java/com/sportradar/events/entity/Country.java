@@ -7,7 +7,7 @@ import lombok.*;
 @Getter @Setter @NoArgsConstructor
 public class Country {
     @Id
-    @Column(length = 3)
+    @Column(length = 3, columnDefinition = "CHAR(3)")
     private String code;
     private String name;
 }
