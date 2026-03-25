@@ -3,6 +3,9 @@ package com.sportradar.events.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Entity @Table(name = "event")
 @Getter @Setter @NoArgsConstructor
 public class Event {
