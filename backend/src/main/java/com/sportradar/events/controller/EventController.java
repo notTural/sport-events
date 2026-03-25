@@ -1,6 +1,7 @@
 package com.sportradar.events.controller;
 
 import com.sportradar.events.dto.CreateEventRequestDto;
+import com.sportradar.events.dto.EventDetailResponseDto;
 import com.sportradar.events.dto.EventResponseDto;
 import com.sportradar.events.service.EventService;
 import jakarta.validation.Valid;
@@ -28,8 +29,8 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponseDto> getOne(@PathVariable Integer id) {
-        return ResponseEntity.ok(eventService.getEventById(id));
+    public ResponseEntity<EventDetailResponseDto> getOne(@PathVariable Integer id) {
+        return ResponseEntity.ok(eventService.getEventDetail(id));
     }
 
     @PostMapping

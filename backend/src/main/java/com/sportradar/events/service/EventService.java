@@ -20,7 +20,11 @@ import com.sportradar.events.repository.StageRepository;
 import com.sportradar.events.repository.GroupTableRepository;
 import com.sportradar.events.repository.TeamRepository;
 import com.sportradar.events.repository.VenueRepository;
+import com.sportradar.events.repository.ResultRepository;
+import com.sportradar.events.repository.GoalEventRepository;
+import com.sportradar.events.repository.CardEventRepository;
 import com.sportradar.events.dto.EventResponseDto;
+import com.sportradar.events.dto.EventDetailResponseDto;
 import com.sportradar.events.dto.CreateEventRequestDto;
 
 @Service
@@ -33,6 +37,9 @@ public class EventService {
     private final GroupTableRepository groupTableRepository;
     private final TeamRepository teamRepository;
     private final VenueRepository venueRepository;
+    private final ResultRepository resultRepository;
+    private final GoalEventRepository goalEventRepository;
+    private final CardEventRepository cardEventRepository;
 
     public List<EventResponseDto> getAllEvents(
             String competitionId,
@@ -52,10 +59,83 @@ public class EventService {
                 .toList();
     }
 
-    public EventResponseDto getEventById(Integer id) {
+    public EventDetailResponseDto getEventDetail(Integer id) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Event not found"));
-        return toDto(event);
+
+        EventDetailResponseDto dto = new EventDetailResponseDto();
+        dto.setId(event.getId());
+        dto.setSeason(event.getSeason());
+        dto.setDateVenue(event.getDateVenue());
+        dto.setTimeVenueUtc(event.getTimeVenueUtc());
+        dto.setStatus(event.getStatus());
+        dto.setCompetitionId(event.getCompetition().getId());
+        dto.setCompetitionName(event.getCompetition().getName());
+        dto.setStageId(event.getStage().getId());
+        dto.setStageName(event.getStage().getName());
+
+        if (event.getHomeTeam() != null) dto.setHomeTeam(toDetailTeamDto(event.getHomeTeam()));
+        if (event.getAwayTeam() != null) dto.setAwayTeam(toDetailTeamDto(event.getAwayTeam()));
+
+        if (event.getVenue() != null) {
+            dto.setVenueName(event.getVenue().getName());
+            dto.setVenueCity(event.getVenue().getCity());
+            dto.setVenueCapacity(event.getVenue().getCapacity());
+            if (event.getVenue().getCountry() != null)
+                dto.setVenueCountry(event.getVenue().getCountry().getName());
+        }
+
+        resultRepository.findByEventId(id).ifPresent(result -> {
+            var goals = goalEventRepository.findByResultIdWithTeam(result.getId());
+            var cards = cardEventRepository.findByResultIdWithTeam(result.getId());
+
+            Integer homeTeamId = event.getHomeTeam() != null ? event.getHomeTeam().getId() : null;
+            Integer awayTeamId = event.getAwayTeam() != null ? event.getAwayTeam().getId() : null;
+
+            int homeScore = (int) goals.stream()
+                    .filter(g -> g.getTeam() != null && g.getTeam().getId().equals(homeTeamId))
+                    .count();
+            int awayScore = (int) goals.stream()
+                    .filter(g -> g.getTeam() != null && g.getTeam().getId().equals(awayTeamId))
+                    .count();
+
+            EventDetailResponseDto.ResultDto resultDto = new EventDetailResponseDto.ResultDto();
+            if (result.getWinnerTeam() != null) {
+                resultDto.setWinnerTeamId(result.getWinnerTeam().getId());
+                resultDto.setWinnerTeamName(result.getWinnerTeam().getName());
+            }
+            resultDto.setMessage(result.getMessage());
+            resultDto.setHomeScore(homeScore);
+            resultDto.setAwayScore(awayScore);
+
+            resultDto.setGoals(goals.stream().map(g -> {
+                EventDetailResponseDto.GoalDto gdto = new EventDetailResponseDto.GoalDto();
+                if (g.getTeam() != null) {
+                    gdto.setTeamId(g.getTeam().getId());
+                    gdto.setTeamName(g.getTeam().getName());
+                }
+                gdto.setPlayerName(g.getPlayerName());
+                gdto.setMinute(g.getMinute());
+                gdto.setGoalType(g.getGoalType());
+                return gdto;
+            }).toList());
+
+            resultDto.setCards(cards.stream().map(c -> {
+                EventDetailResponseDto.CardDto cdto = new EventDetailResponseDto.CardDto();
+                if (c.getTeam() != null) {
+                    cdto.setTeamId(c.getTeam().getId());
+                    cdto.setTeamName(c.getTeam().getName());
+                }
+                cdto.setPlayerName(c.getPlayerName());
+                cdto.setMinute(c.getMinute());
+                cdto.setCardType(c.getCardType());
+                return cdto;
+            }).toList());
+
+            dto.setResult(resultDto);
+        });
+
+        return dto;
     }
 
     public EventResponseDto createEvent(CreateEventRequestDto req) {
@@ -132,6 +212,16 @@ public class EventService {
 
     private EventResponseDto.TeamDto toTeamDto(Team t) {
         EventResponseDto.TeamDto dto = new EventResponseDto.TeamDto();
+        dto.setId(t.getId());
+        dto.setName(t.getName());
+        dto.setOfficialName(t.getOfficialName());
+        dto.setAbbreviation(t.getAbbreviation());
+        dto.setCountryCode(t.getCountry().getCode());
+        return dto;
+    }
+
+    private EventDetailResponseDto.TeamDto toDetailTeamDto(Team t) {
+        EventDetailResponseDto.TeamDto dto = new EventDetailResponseDto.TeamDto();
         dto.setId(t.getId());
         dto.setName(t.getName());
         dto.setOfficialName(t.getOfficialName());
