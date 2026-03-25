@@ -3,9 +3,8 @@ package com.sportradar.events.controller;
 import com.sportradar.events.dto.CreateEventRequestDto;
 import com.sportradar.events.dto.EventResponseDto;
 import com.sportradar.events.service.EventService;
-import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import lombok.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +19,12 @@ public class EventController {
     private final EventService eventService;
 
     @GetMapping
-    public ResponseEntity<List<EventResponseDto>> getAll() {
-        return ResponseEntity.ok(eventService.getAllEvents());
+    public ResponseEntity<List<EventResponseDto>> getAll(
+            @RequestParam(required = false) String competitionId,
+            @RequestParam(required = false) Integer teamId,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false, defaultValue = "asc") String sortDate) {
+        return ResponseEntity.ok(eventService.getAllEvents(competitionId, teamId, status, sortDate));
     }
 
     @GetMapping("/{id}")

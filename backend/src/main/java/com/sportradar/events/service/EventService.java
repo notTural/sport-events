@@ -1,18 +1,25 @@
 package com.sportradar.events.service;
 
+import com.sportradar.events.entity.Event;
 import com.sportradar.events.entity.Team;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.ArrayList;
 import java.util.List;
+
 import com.sportradar.events.repository.EventRepository;
 import com.sportradar.events.repository.CompetitionRepository;
 import com.sportradar.events.repository.StageRepository;
 import com.sportradar.events.repository.GroupTableRepository;
 import com.sportradar.events.repository.TeamRepository;
 import com.sportradar.events.repository.VenueRepository;
-import com.sportradar.events.entity.Event;
 import com.sportradar.events.dto.EventResponseDto;
 import com.sportradar.events.dto.CreateEventRequestDto;
 
@@ -27,8 +34,19 @@ public class EventService {
     private final TeamRepository teamRepository;
     private final VenueRepository venueRepository;
 
-    public List<EventResponseDto> getAllEvents() {
-        return eventRepository.findAllWithDetails()
+    public List<EventResponseDto> getAllEvents(
+            String competitionId,
+            Integer teamId,
+            String status,
+            String sortDate) {
+
+        Specification<Event> spec = buildSpec(competitionId, teamId, status);
+        Sort sort = Sort.by(
+            "desc".equalsIgnoreCase(sortDate) ? Sort.Direction.DESC : Sort.Direction.ASC,
+            "dateVenue"
+        );
+
+        return eventRepository.findAll(spec, sort)
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -66,6 +84,30 @@ public class EventService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Venue not found")));
 
         return toDto(eventRepository.save(event));
+    }
+
+    private Specification<Event> buildSpec(String competitionId, Integer teamId, String status) {
+        return (root, query, cb) -> {
+            query.distinct(true);
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (competitionId != null && !competitionId.isBlank())
+                predicates.add(cb.equal(root.get("competition").get("id"), competitionId));
+
+            if (status != null && !status.isBlank())
+                predicates.add(cb.equal(root.get("status"), status));
+
+            if (teamId != null) {
+                var homeJoin = root.join("homeTeam", JoinType.LEFT);
+                var awayJoin = root.join("awayTeam", JoinType.LEFT);
+                predicates.add(cb.or(
+                    cb.equal(homeJoin.get("id"), teamId),
+                    cb.equal(awayJoin.get("id"), teamId)
+                ));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     private EventResponseDto toDto(Event e) {

@@ -6,6 +6,23 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@NamedEntityGraph(
+    name = "Event.details",
+    attributeNodes = {
+        @NamedAttributeNode("competition"),
+        @NamedAttributeNode("stage"),
+        @NamedAttributeNode("group"),
+        @NamedAttributeNode(value = "homeTeam", subgraph = "team-with-country"),
+        @NamedAttributeNode(value = "awayTeam", subgraph = "team-with-country"),
+        @NamedAttributeNode("venue")
+    },
+    subgraphs = {
+        @NamedSubgraph(
+            name = "team-with-country",
+            attributeNodes = { @NamedAttributeNode("country") }
+        )
+    }
+)
 @Entity @Table(name = "event")
 @Getter @Setter @NoArgsConstructor
 public class Event {
