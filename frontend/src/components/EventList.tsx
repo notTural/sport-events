@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { fetchEvents } from '../api/events';
 import type { EventFilterParams } from '../api/events';
 import { fetchCompetitions } from '../api/competitions';
@@ -9,20 +10,23 @@ import AddEventForm from './AddEventForm';
 
 const STATUSES = ['scheduled', 'played', 'cancelled'];
 
-const EMPTY_FILTERS: EventFilterParams = {
-  competitionId: '',
-  teamId: undefined,
-  status: '',
-  sortDate: 'asc',
-};
+function filtersFromParams(params: URLSearchParams): EventFilterParams {
+  return {
+    competitionId: params.get('competitionId') || undefined,
+    teamId: params.get('teamId') ? Number(params.get('teamId')) : undefined,
+    status: params.get('status') || undefined,
+    sortDate: (params.get('sortDate') as 'asc' | 'desc') || 'asc',
+  };
+}
 
 export default function EventList() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filters = filtersFromParams(searchParams);
+
   const [events, setEvents] = useState<EventResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-
-  const [filters, setFilters] = useState<EventFilterParams>(EMPTY_FILTERS);
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
 
@@ -31,46 +35,40 @@ export default function EventList() {
     fetchTeams().then(setTeams).catch(() => {});
   }, []);
 
-  const loadEvents = (params: EventFilterParams = filters) => {
+  useEffect(() => {
     setLoading(true);
     setError(null);
-    fetchEvents(params)
+    fetchEvents(filters)
       .then(setEvents)
-      .catch((e: unknown) =>
-        setError(e instanceof Error ? e.message : 'Unknown error')
-      )
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : 'Unknown error'))
       .finally(() => setLoading(false));
+  }, [searchParams]);
+
+  const setParam = (name: string, value: string | undefined) => {
+    setSearchParams(prev => {
+      const next = new URLSearchParams(prev);
+      if (value) next.set(name, value);
+      else next.delete(name);
+      return next;
+    }, { replace: true });
   };
 
-  useEffect(() => {
-    loadEvents(filters);
-  }, [filters]);
-
-  const handleFilterChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: name === 'teamId' ? (value ? Number(value) : undefined) : value || undefined,
-    }));
+    setParam(name, value || undefined);
   };
 
   const toggleSort = () => {
-    setFilters(prev => ({
-      ...prev,
-      sortDate: prev.sortDate === 'asc' ? 'desc' : 'asc',
-    }));
+    setParam('sortDate', filters.sortDate === 'asc' ? 'desc' : 'asc');
   };
 
-  const clearFilters = () => setFilters(EMPTY_FILTERS);
+  const clearFilters = () => setSearchParams(new URLSearchParams(), { replace: true });
 
-  const isFiltered =
-    !!filters.competitionId || filters.teamId != null || !!filters.status;
+  const isFiltered = !!filters.competitionId || filters.teamId != null || !!filters.status;
 
   const handleCreated = () => {
     setShowForm(false);
-    loadEvents(filters);
+    fetchEvents(filters).then(setEvents).catch(() => {});
   };
 
   return (
