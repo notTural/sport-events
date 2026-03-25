@@ -1,20 +1,33 @@
 import { useEffect, useState } from 'react';
 import { fetchTeams } from '../api/teams';
 import type { Team } from '../types/event';
+import AddTeamForm from './AddTeamForm';
 
 export default function TeamList() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
+  const loadTeams = () => {
+    setLoading(true);
+    setError(null);
     fetchTeams()
       .then(setTeams)
       .catch((e: unknown) =>
         setError(e instanceof Error ? e.message : 'Unknown error')
       )
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadTeams();
   }, []);
+
+  const handleCreated = () => {
+    setShowForm(false);
+    loadTeams();
+  };
 
   return (
     <div className="page-container">
@@ -25,7 +38,19 @@ export default function TeamList() {
             {loading ? 'Loading…' : `${teams.length} team${teams.length !== 1 ? 's' : ''} total`}
           </p>
         </div>
+        {!showForm && (
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            + Add Team
+          </button>
+        )}
       </div>
+
+      {showForm && (
+        <AddTeamForm
+          onCreated={handleCreated}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
       {loading && (
         <div className="state-msg">

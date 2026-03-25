@@ -22,6 +22,17 @@ export interface Competition {
   name: string;
 }
 
+export interface Stage {
+  id: string;
+  name: string;
+  ordering: number;
+}
+
+export interface Country {
+  code: string;
+  name: string;
+}
+
 export interface EventResponse {
   id: number;
   season: number;
@@ -36,4 +47,29 @@ export interface EventResponse {
   awayTeam: TeamDto | null;
   venueName: string | null;
   venueCity: string | null;
+}
+
+export interface CreateEventRequest {
+  season: number;
+  dateVenue: string;
+  timeVenueUtc: string;
+  status: string;
+  competitionId: string;
+  stageId: string;
+  homeTeamId?: number;
+  awayTeamId?: number;
+}
+
+export interface CreateTeamRequest {
+  slug: string;
+  name: string;
+  officialName: string;
+  abbreviation: string;
+  foundedYear?: number;
+  countryCode: string;
+}
+
+export interface CreateCompetitionRequest {
+  id: string;
+  name: string;
 }

@@ -1,20 +1,33 @@
 import { useEffect, useState } from 'react';
 import { fetchCompetitions } from '../api/competitions';
 import type { Competition } from '../types/event';
+import AddCompetitionForm from './AddCompetitionForm';
 
 export default function CompetitionList() {
   const [competitions, setCompetitions] = useState<Competition[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
-  useEffect(() => {
+  const loadCompetitions = () => {
+    setLoading(true);
+    setError(null);
     fetchCompetitions()
       .then(setCompetitions)
       .catch((e: unknown) =>
         setError(e instanceof Error ? e.message : 'Unknown error')
       )
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadCompetitions();
   }, []);
+
+  const handleCreated = () => {
+    setShowForm(false);
+    loadCompetitions();
+  };
 
   return (
     <div className="page-container">
@@ -25,7 +38,19 @@ export default function CompetitionList() {
             {loading ? 'Loading…' : `${competitions.length} competition${competitions.length !== 1 ? 's' : ''} total`}
           </p>
         </div>
+        {!showForm && (
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            + Add Competition
+          </button>
+        )}
       </div>
+
+      {showForm && (
+        <AddCompetitionForm
+          onCreated={handleCreated}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
       {loading && (
         <div className="state-msg">

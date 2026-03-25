@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { fetchEvents } from '../api/events';
 import type { EventResponse } from '../types/event';
 import EventCard from './EventCard';
+import AddEventForm from './AddEventForm';
 
 export default function EventList() {
   const [events, setEvents] = useState<EventResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
 
   const loadEvents = () => {
     setLoading(true);
@@ -23,6 +25,11 @@ export default function EventList() {
     loadEvents();
   }, []);
 
+  const handleCreated = () => {
+    setShowForm(false);
+    loadEvents();
+  };
+
   return (
     <div className="event-list-container">
       <div className="event-list-toolbar">
@@ -32,7 +39,19 @@ export default function EventList() {
             {loading ? 'Loading…' : `${events.length} event${events.length !== 1 ? 's' : ''} total`}
           </p>
         </div>
+        {!showForm && (
+          <button className="btn-primary" onClick={() => setShowForm(true)}>
+            + Add Event
+          </button>
+        )}
       </div>
+
+      {showForm && (
+        <AddEventForm
+          onCreated={handleCreated}
+          onCancel={() => setShowForm(false)}
+        />
+      )}
 
       {loading && (
         <div className="state-msg">
