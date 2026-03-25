@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import type { EventResponse } from '../types/event';
 
 interface Props {
@@ -11,6 +12,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function EventCard({ event }: Props) {
+  const navigate = useNavigate();
   const date = new Date(event.dateVenue).toLocaleDateString('en-GB', {
     weekday: 'short',
     day: '2-digit',
@@ -23,7 +25,7 @@ export default function EventCard({ event }: Props) {
   const awayTeam = event.awayTeam?.name ?? 'TBD';
 
   return (
-    <div className="event-card">
+    <div className="event-card event-card--clickable" onClick={() => navigate(`/events/${event.id}`)}>
       <div className="event-card-header">
         <span className="competition">{event.competitionName}</span>
         <span className="stage">{event.stageName}</span>

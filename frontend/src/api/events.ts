@@ -1,4 +1,4 @@
-import type { CreateEventRequest, EventResponse } from '../types/event';
+import type { CreateEventRequest, EventDetail, EventResponse } from '../types/event';
 
 const BASE = '/api/events';
 
@@ -18,6 +18,12 @@ export async function fetchEvents(params?: EventFilterParams): Promise<EventResp
   const url = qs.toString() ? `${BASE}?${qs}` : BASE;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch events (${res.status})`);
+  return res.json();
+}
+
+export async function fetchEventDetail(id: number): Promise<EventDetail> {
+  const res = await fetch(`${BASE}/${id}`);
+  if (!res.ok) throw new Error(`Failed to fetch event (${res.status})`);
   return res.json();
 }
 

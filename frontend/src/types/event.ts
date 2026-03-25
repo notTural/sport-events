@@ -73,3 +73,48 @@ export interface CreateCompetitionRequest {
   id: string;
   name: string;
 }
+
+export interface GoalDto {
+  teamId: number | null;
+  teamName: string | null;
+  playerName: string | null;
+  minute: number | null;
+  goalType: string | null;
+}
+
+export interface CardDto {
+  teamId: number | null;
+  teamName: string | null;
+  playerName: string | null;
+  minute: number | null;
+  cardType: string;
+}
+
+export interface ResultDetail {
+  winnerTeamId: number | null;
+  winnerTeamName: string | null;
+  message: string | null;
+  homeScore: number;
+  awayScore: number;
+  goals: GoalDto[];
+  cards: CardDto[];
+}
+
+export interface EventDetail {
+  id: number;
+  season: number;
+  dateVenue: string;
+  timeVenueUtc: string | null;
+  status: string;
+  competitionId: string;
+  competitionName: string;
+  stageId: string;
+  stageName: string;
+  homeTeam: TeamDto | null;
+  awayTeam: TeamDto | null;
+  venueName: string | null;
+  venueCity: string | null;
+  venueCapacity: number | null;
+  venueCountry: string | null;
+  result: ResultDetail | null;
+}
