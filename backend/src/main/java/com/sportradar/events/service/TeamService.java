@@ -1,7 +1,9 @@
 package com.sportradar.events.service;
 
+import com.sportradar.events.dto.CreateTeamRequestDto;
 import com.sportradar.events.dto.TeamResponseDto;
 import com.sportradar.events.entity.Team;
+import com.sportradar.events.repository.CountryRepository;
 import com.sportradar.events.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 public class TeamService {
 
     private final TeamRepository teamRepository;
+    private final CountryRepository countryRepository;
 
     public List<TeamResponseDto> getAllTeams() {
         return teamRepository.findAll()
@@ -27,6 +30,18 @@ public class TeamService {
         Team team = teamRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
         return toDto(team);
+    }
+
+    public TeamResponseDto createTeam(CreateTeamRequestDto req) {
+        Team team = new Team();
+        team.setSlug(req.getSlug());
+        team.setName(req.getName());
+        team.setOfficialName(req.getOfficialName());
+        team.setAbbreviation(req.getAbbreviation());
+        team.setFoundedYear(req.getFoundedYear());
+        team.setCountry(countryRepository.findById(req.getCountryCode())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Country not found")));
+        return toDto(teamRepository.save(team));
     }
 
     private TeamResponseDto toDto(Team t) {

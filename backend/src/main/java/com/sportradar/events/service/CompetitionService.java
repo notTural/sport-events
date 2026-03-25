@@ -1,6 +1,7 @@
 package com.sportradar.events.service;
 
 import com.sportradar.events.dto.CompetitionResponseDto;
+import com.sportradar.events.dto.CreateCompetitionRequestDto;
 import com.sportradar.events.entity.Competition;
 import com.sportradar.events.repository.CompetitionRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,16 @@ public class CompetitionService {
         Competition competition = competitionRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Competition not found"));
         return toDto(competition);
+    }
+
+    public CompetitionResponseDto createCompetition(CreateCompetitionRequestDto req) {
+        if (competitionRepository.existsById(req.getId())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Competition with this id already exists");
+        }
+        Competition competition = new Competition();
+        competition.setId(req.getId());
+        competition.setName(req.getName());
+        return toDto(competitionRepository.save(competition));
     }
 
     private CompetitionResponseDto toDto(Competition c) {
