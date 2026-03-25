@@ -305,3 +305,127 @@
   color: #fff;
   border-bottom: 2px solid #f43f5e;
 }
+
+/* ── Teams & Competitions Grid ───────────────────────────────── */
+.page-container {
+  animation: fadeIn 0.25s ease;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* Team Card */
+.team-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  transition: box-shadow 0.2s, transform 0.15s;
+}
+
+.team-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.team-card-abbr {
+  background: #0f172a;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+  min-width: 48px;
+  text-align: center;
+}
+
+.team-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.team-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-card-official {
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.team-card-meta {
+  display: flex;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.team-card-country {
+  font-size: 0.75rem;
+  color: #f43f5e;
+  font-weight: 600;
+}
+
+.team-card-founded {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+/* Competition Card */
+.competition-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 22px;
+  transition: box-shadow 0.2s, transform 0.15s;
+  border-left: 4px solid #f43f5e;
+}
+
+.competition-card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.competition-card-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.competition-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.competition-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.competition-card-id {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-family: monospace;
+}

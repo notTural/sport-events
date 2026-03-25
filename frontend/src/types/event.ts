@@ -6,6 +6,22 @@ export interface TeamDto {
   countryCode: string;
 }
 
+export interface Team {
+  id: number;
+  slug: string;
+  name: string;
+  officialName: string;
+  abbreviation: string;
+  foundedYear: number | null;
+  countryCode: string;
+  countryName: string;
+}
+
+export interface Competition {
+  id: string;
+  name: string;
+}
+
 export interface EventResponse {
   id: number;
   season: number;
