@@ -1,0 +1,14 @@
+AI Reflections
+==============
+
+I used AI as a tool, not a replacement for thinking. Decisions were mine and AI handled the execution.
+
+For the database design I studied the raw API data myself and mapped out the relationships before involving AI. 
+I then described the schema and had it generate the ERD. 
+Reviewing the output was where I caught redundant fields like stored goal counts and the score by period table, both of which I flagged as derivable from goal events. 
+The winner field was also my call to store as a foreign key rather than a plain string.
+
+For implementation I worked in Cursor. 
+My workflow was to decide what I wanted, describe it clearly, let AI write the code, read through everything, and then test the endpoints. 
+The review step was always necessary. 
+The main value AI provided was speed on boilerplate, which let me focus on the parts that actually required decisions.
