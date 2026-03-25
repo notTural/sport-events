@@ -1,5 +1,8 @@
 package com.sportradar.events.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 @Entity @Table(name = "stage")
 @Getter @Setter @NoArgsConstructor
 public class Stage {

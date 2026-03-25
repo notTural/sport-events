@@ -1,5 +1,8 @@
 package com.sportradar.events.entity;
 
+import jakarta.persistence.*;
+import lombok.*;
+
 @Entity @Table(name = "venue")
 @Getter @Setter @NoArgsConstructor
 public class Venue {
