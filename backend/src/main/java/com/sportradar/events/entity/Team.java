@@ -1,3 +1,5 @@
+package com.sportradar.events.entity;
+
 @Entity @Table(name = "team")
 @Getter @Setter @NoArgsConstructor
 public class Team {

@@ -1,3 +1,5 @@
+package com.sportradar.events.entity;
+
 @Entity @Table(name = "group_table")
 @Getter @Setter @NoArgsConstructor
 public class GroupTable {

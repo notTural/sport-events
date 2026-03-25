@@ -1,3 +1,5 @@
+package com.sportradar.events.entity;
+
 @Entity @Table(name = "goal_event")
 @Getter @Setter @NoArgsConstructor
 public class GoalEvent {

@@ -1,3 +1,5 @@
+package com.sportradar.events.entity;
+
 @Entity @Table(name = "card_event")
 @Getter @Setter @NoArgsConstructor
 public class CardEvent {

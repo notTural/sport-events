@@ -1,3 +1,5 @@
+package com.sportradar.events.entity;
+
 @Entity @Table(name = "venue")
 @Getter @Setter @NoArgsConstructor
 public class Venue {
